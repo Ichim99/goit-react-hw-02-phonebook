@@ -3,6 +3,7 @@ import { useSelector, useDispatch } from 'react-redux';
 import { getFilterValue, getContacts } from '../../redux/selector';
 import { deleteContact } from '../../redux/actions';
 
+
 const ContactList = () => {
   const contacts = useSelector(getContacts);
   const filter = useSelector(getFilterValue);
