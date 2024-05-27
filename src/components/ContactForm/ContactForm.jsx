@@ -1,38 +1,41 @@
+import { nanoid } from 'nanoid';
 import { useDispatch, useSelector } from 'react-redux';
-import { selectContacts } from '../../redux/selector';
-import { addContact } from '../../redux/contacts';
-
-
+import { getContacts } from '../../redux/selector';
+import { addNewContact } from '../../redux/actions';
 
 const ContactForm = () => {
-  const contacts = useSelector(selectContacts);
+  const contacts = useSelector(getContacts);
   const dispatch = useDispatch();
 
-  const handleAddContact = e => {
+  const addContact = e => {
     e.preventDefault();
-
+    let nameOntheList = false;
     const form = e.target;
     const name = e.target.name.value;
-    const phone = e.target.phone.value;
-    const nameOnTheList = contacts.some(
-      contact => contact.name.toLowerCase() === name.toLowerCase()
-    );
+    const number = e.target.number.value;
+    const toLowerCase = name.toLowerCase();
 
     const newContact = {
+      id: nanoid(),
       name: name,
-      phone: phone,
+      number: number,
     };
 
-    if (!nameOnTheList) {
-      dispatch(addContact(newContact));
-      form.reset();
-    } else {
-      alert(`${name} is in use. Try another name.`);
-    }
-  };
+    contacts.forEach(({ name }) => {
+      if (name.toLowerCase() === toLowerCase) {
+        alert(`${name} is already in contacts`);
+        nameOntheList = true;
+        form.reset();
+      }
+    });
 
+    if (nameOntheList) return;
+
+    dispatch(addNewContact(newContact));
+    form.reset();
+  };
   return (
-    <form onSubmit={handleAddContact}>
+    <form onSubmit={addContact}>
       <label htmlFor="name">
         Name
         <input
@@ -45,12 +48,12 @@ const ContactForm = () => {
           required
         />
       </label>
-      <label htmlFor="phone">
+      <label htmlFor="number">
         Number
         <input
           autoComplete="off"
           type="tel"
-          name="phone"
+          name="number"
           pattern="\+?\d{1,4}?[-.\s]?\(?\d{1,3}?\)?[-.\s]?\d{1,4}[-.\s]?\d{1,4}[-.\s]?\d{1,9}"
           title="Phone number must be digits and can contain spaces, dashes, parentheses and can start with +"
           placeholder="e.g. 123-456-789"
